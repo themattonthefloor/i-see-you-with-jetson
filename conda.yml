@@ -1,0 +1,54 @@
+name: whyre_tech_dev
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.7.11
+  - pip=20.2.2
+  - pip:
+    - pandas==1.1.5
+    - mlflow==1.22.0
+    - pylint==2.6.0
+    - pytest-cov==2.10.1
+    - Flask==1.1.2
+    - seldon-core==1.6
+    - tensorflow==2.3.0
+    - tensorflow_hub==0.10.0
+    - pyyaml==5.4.1
+    - python-json-logger==2.0.2
+    - polyaxon==1.11.3
+    - google-cloud-storage==1.43.0
+    - hydra-core==1.1.1
+    - optuna==2.10.0
+    - cython
+    - opencv-python
+    - pynvml
+    - regex==2022.1.18
+    - patool==1.12
+    - scikit-image==0.19.1
+    - scikit-learn==1.0.2
+    - ImageHash==4.2.1
+    - matplotlib==3.5.1
+    - albumentations==1.1.0
+    - imantics==0.1.12
+
+    # - https://download.pytorch.org/whl/cu101/torch-1.6.0%2Bcu101-cp37-cp37m-linux_x86_64.whl # for cuda10.1, py3.7 linux
+    # - https://download.pytorch.org/whl/cu102/torch-1.6.0-cp37-cp37m-linux_x86_64.whl
+
+    # - https://download.pytorch.org/whl/cu101/torchvision-0.7.0%2Bcu101-cp37-cp37m-linux_x86_64.whl # for cuda10.1, py3.7 linux
+    # - https://download.pytorch.org/whl/cu102/torchvision-0.7.0-cp37-cp37m-linux_x86_64.whl
+
+    # - https://download.pytorch.org/whl/cu102/torch-1.6.0-cp36-cp36m-win_amd64.whl
+    # - https://download.pytorch.org/whl/cu102/torchvision-0.7.0-cp36-cp36m-win_amd64.whl
+
+    - https://download.pytorch.org/whl/cu110/torch-1.7.0%2Bcu110-cp37-cp37m-linux_x86_64.whl # for cuda11.0, py3.7 linux
+    - https://download.pytorch.org/whl/cu110/torchvision-0.8.0-cp37-cp37m-linux_x86_64.whl
+    
+    # - https://download.pytorch.org/whl/cu110/torch-1.7.0%2Bcu110-cp37-cp37m-win_amd64.whl # for cuda11.0, py3.7 windows
+    # - https://download.pytorch.org/whl/cu110/torchvision-0.8.0-cp37-cp37m-win_amd64.whl
+    
+    # Mask-RCNN inference requires torchvision torchvision 0.10.0 or later to draw bounding boxes and segmentations.
+    # - https://download.pytorch.org/whl/cu113/torch-1.10.2%2Bcu113-cp37-cp37m-win_amd64.whl # for cuda 11.3, py3.7, 30 series GPU
+    # - https://download.pytorch.org/whl/cu113/torchvision-0.11.3%2Bcu113-cp37-cp37m-win_amd64.whl # for cuda 11.3, py3.7, 30 series GPU
+
+    # -  # run pip install on this, not together with yml
