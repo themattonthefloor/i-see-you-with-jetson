@@ -28,7 +28,7 @@ def gstreamer_pipeline(
             display_height,
         )
     )
-
+window_title = "Camera"
 cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=2), cv2.CAP_GSTREAMER)
 window_handle = cv2.namedWindow(window_title, cv2.WINDOW_AUTOSIZE)
 while True:
