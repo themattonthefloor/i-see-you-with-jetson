@@ -1,16 +1,33 @@
 import numpy as np
 import cv2
 
-def open_cam_onboard(width, height):
-    # On versions of L4T previous to L4T 28.1, flip-method=2
-    # Use Jetson onboard camera
-    gst_str = ("nvcamerasrc ! "
-               "video/x-raw(memory:NVMM), width=(int)2592, height=(int)1458, format=(string)I420, framerate=(fraction)30/1 ! "
-               "nvvidconv ! video/x-raw, width=(int){}, height=(int){}, format=(string)BGRx ! "
-               "videoconvert ! appsink").format(width, height)
-    return cv2.VideoCapture(gst_str, cv2.CAP_GSTREAMER)
+def gstreamer_pipeline(
+    capture_width=1920,
+    capture_height=1080,
+    display_width=960,
+    display_height=540,
+    framerate=30,
+    flip_method=0,
+):
+    return (
+        "nvarguscamerasrc ! "
+        "video/x-raw(memory:NVMM), "
+        "width=(int)%d, height=(int)%d, framerate=(fraction)%d/1 ! "
+        "nvvidconv flip-method=%d ! "
+        "video/x-raw, width=(int)%d, height=(int)%d, format=(string)BGRx ! "
+        "videoconvert ! "
+        "video/x-raw, format=(string)BGR ! appsink drop=True"
+        % (
+            capture_width,
+            capture_height,
+            framerate,
+            flip_method,
+            display_width,
+            display_height,
+        )
+    )
 
-cap = open_cam_onboard(1920,1080)
+cap = cv2.VideoCapture(gstreamer_pipeline(), cv2.CAP_GSTREAMER)
 cap.set(3,640) # set Width
 cap.set(4,480) # set Height
 while True:
