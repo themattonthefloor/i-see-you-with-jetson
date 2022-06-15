@@ -26,19 +26,21 @@ def gstreamer_pipeline(
             display_height,
         )
     )
+def show_camera(onboard_cam=True):
+    window_title = "Camera"
+    if onboard_cam:
+        cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=2), cv2.CAP_GSTREAMER)
+        window_handle = cv2.namedWindow(window_title, cv2.WINDOW_AUTOSIZE)
+    else:
+        cap = cv2.VideoCapture(0)
+    cap.set(3,640) # set Width
+    cap.set(4,480) # set Height
 
-cap = cv2.VideoCapture(gstreamer_pipeline(), cv2.CAP_GSTREAMER)
-# cap = cv2.VideoCapture(0)
-# cap.set(3,640) # set Width
-# cap.set(4,480) # set Height
-window_title = "CSI Camera"
-window_handle = cv2.namedWindow(window_title, cv2.WINDOW_AUTOSIZE)
-while True:
-    ret, img = cap.read()
-    # img = cv2.flip(img, -1)
-    cv2.imshow(window_title,img)
-    k = cv2.waitKey(30) & 0xff
-    if k == 27: # press 'ESC' to quit
-        break
-cap.release()
-cv2.destroyAllWindows()
+    while True:
+        ret, img = cap.read()
+        cv2.imshow(window_title,img)
+        k = cv2.waitKey(30) & 0xff
+        if k == 27: # press 'ESC' to quit
+            break
+    cap.release()
+    cv2.destroyAllWindows()
