@@ -43,10 +43,8 @@ def show_camera(use_usb=False):
     if use_usb:
         cap = cv2.VideoCapture(0)
     else:
-        cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
+        cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=2), cv2.CAP_GSTREAMER)
         window_handle = cv2.namedWindow(window_title, cv2.WINDOW_AUTOSIZE)
-    # cap.set(3,640) # set Width
-    # cap.set(4,480) # set Height
 
     while True:
         ret, img = cap.read()
