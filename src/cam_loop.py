@@ -1,5 +1,17 @@
 import numpy as np
+import argparse
 import cv2
+
+def parse_args():
+    """
+    Parse input arguments
+    """
+    parser = argparse.ArgumentParser(description="Capture and display live camera video on Jetson TX2/TX1")
+    parser.add_argument("--usb", dest="use_usb",
+                        help="use USB webcam",
+                        action="store_true")
+    args = parser.parse_args()
+    return args
 
 def gstreamer_pipeline(
     capture_width=1920,
@@ -26,13 +38,13 @@ def gstreamer_pipeline(
             display_height,
         )
     )
-def show_camera(onboard_cam=True):
+def show_camera(use_usb=False):
     window_title = "Camera"
-    if onboard_cam:
+    if use_usb:
+        cap = cv2.VideoCapture(0)
+    else:
         cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=2), cv2.CAP_GSTREAMER)
         window_handle = cv2.namedWindow(window_title, cv2.WINDOW_AUTOSIZE)
-    else:
-        cap = cv2.VideoCapture(0)
     cap.set(3,640) # set Width
     cap.set(4,480) # set Height
 
@@ -44,3 +56,10 @@ def show_camera(onboard_cam=True):
             break
     cap.release()
     cv2.destroyAllWindows()
+
+if __name__ == '__main__':
+    args = parse_args()
+    if args.use_usb:
+        show_camera(use_usb=True)
+    else:
+        show_camera()
