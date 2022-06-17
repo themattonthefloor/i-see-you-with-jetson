@@ -46,18 +46,18 @@ def show_camera(use_usb=False):
         cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=2), cv2.CAP_GSTREAMER)
         window_handle = cv2.namedWindow(window_title, cv2.WINDOW_AUTOSIZE)
 
-    while True:
-        ret, img = cap.read()
-        cv2.imshow(window_title,img)
-        k = cv2.waitKey(30) & 0xff
-        if k == 27: # press 'ESC' to quit
-            break
-    cap.release()
-    cv2.destroyAllWindows()
+    try:
+        while True:
+            ret, img = cap.read()
+            cv2.imshow(window_title,img)
+            k = cv2.waitKey(30) & 0xff
+            if k == 27: # press 'ESC' to quit
+                break
+            
+    finally:
+        cap.release()
+        cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     args = parse_args()
-    if args.use_usb:
-        show_camera(use_usb=True)
-    else:
-        show_camera()
+    show_camera(use_usb=args.use_usb)
