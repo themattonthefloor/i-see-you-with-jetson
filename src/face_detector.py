@@ -1,8 +1,10 @@
+import argparse
 import numpy as np
 import cv2
 import cvlib as cv
 from cvlib.object_detection import draw_bbox
 from time import time
+
 
 def parse_args():
     """
