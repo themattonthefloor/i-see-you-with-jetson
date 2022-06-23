@@ -52,7 +52,7 @@ def live_inference(args):
     if args.use_usb:
         cap = cv2.VideoCapture(0)
     else:
-        cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=2), cv2.CAP_GSTREAMER)
+        cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=6), cv2.CAP_GSTREAMER)
         window_handle = cv2.namedWindow(window_title, cv2.WINDOW_AUTOSIZE)
 
     try:
@@ -63,7 +63,7 @@ def live_inference(args):
             # apply face detection
             face, confidence = cv.detect_face(frame, threshold=0.5, enable_gpu = not args.cpu_only)
             
-            print(time()-elapsed_time)
+            print(f"{time()-elapsed_time:.2f} S")
             elapsed_time = time()
             print(face)
             print(confidence)
