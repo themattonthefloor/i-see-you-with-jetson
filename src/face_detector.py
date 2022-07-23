@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 import cvlib as cv
 from cvlib.object_detection import draw_bbox
+from face_recognition.api import face_encodings, compare_faces
 from time import time
 
 
@@ -109,6 +110,9 @@ def live_inference(args):
 
     try:
         elapsed_time = time()
+
+        test_enc = np.array([])
+
         while True:
             ret, frame = cap.read()
 
@@ -125,6 +129,10 @@ def live_inference(args):
             if presence:
                 # Furnish image
                 frame = furnish_image(frame, face, confidence)
+                encs = face_encodings(frame,face) # List of arrays
+                if len(test_enc)==0:
+                    test_enc = encs[0]
+                print(compare_faces([test_enc],encs[0]),confidence)
 
             # Display output
             cv2.imshow(window_title, frame)
