@@ -50,28 +50,27 @@ def gstreamer_pipeline(
         )
     )
 
-def furnish_image(frame, face, confidence):
+def furnish_image(frame, faces, confidences):
     """Draws bounding boxes & prints detection confidence.
 
     Args:
         frame (3D-Numpy Array): cv2 image
-        face (list): list of detected faces
-        confidence (list): list of face detection confidence
+        faces (list): list of detected faces
+        confidences (list): list of face detection confidence
 
     Returns:.
-    
         3D-Numpy Array: cv2 image
     """
     # loop through detected faces
-    for idx, f in enumerate(face):
+    for idx, face in enumerate(faces):
         
-        (startX, startY) = f[0], f[1]
-        (endX, endY) = f[2], f[3]
+        (startX, startY) = face[0], face[1]
+        (endX, endY) = face[2], face[3]
 
         # draw rectangle over face
         cv2.rectangle(frame, (startX,startY), (endX,endY), (0,255,0), 2)
 
-        text = "{:.2f}%".format(confidence[idx] * 100)
+        text = "{:.2f}%".format(confidences[idx] * 100)
 
         Y = startY - 10 if startY - 10 > 10 else startY + 10
 
@@ -82,14 +81,23 @@ def furnish_image(frame, face, confidence):
     return frame
 
 ############
-def create_face_images(frame, face, new_size=(120,180)):
+def create_face_images(frame, faces, new_size=(120,180)):
+    """Extracts the facial images from the frame.
 
+    Args:
+        frame (3D-Numpy Array): cv2 image
+        faces (list): list of detected faces
+        new_size (tuple, optional): Width & Height of face image. Defaults to (120,180).
+
+    Returns:
+        list: List of 3D-Numpy arrays cv2 image of faces
+    """
     # loop through detected faces
     face_imgs = []
-    for idx, f in enumerate(face):
+    for idx, face in enumerate(faces):
         
-        (startX, startY) = f[0], f[1]
-        (endX, endY) = f[2], f[3]
+        (startX, startY) = face[0], face[1]
+        (endX, endY) = face[2], face[3]
 
         # crop the faces
         face_img = frame[startY:endY,startX:endX]
@@ -97,6 +105,8 @@ def create_face_images(frame, face, new_size=(120,180)):
         face_imgs.append(face_img)
         
     return face_imgs
+
+def name_to_faces(faces)
 ###########
 
 def live_inference(args):
@@ -117,22 +127,22 @@ def live_inference(args):
             ret, frame = cap.read()
 
             # apply face detection
-            face, confidence = cv.detect_face(frame, threshold=0.5, enable_gpu = not args.cpu_only)
-            presence = len(face)>0
+            faces, confidences = cv.detect_face(frame, threshold=0.5, enable_gpu = not args.cpu_only)
+            presence = len(faces)>0
 
             if args.verbose:
-                print(f"Frame time: {time()-elapsed_time:.3f}s | Face: {face} | Confidences: {confidence}")
+                print(f"Frame time: {time()-elapsed_time:.3f}s | Face: {faces} | Confidences: {confidences}")
 
             # Reset elapsed time    
             elapsed_time = time()
 
             if presence:
                 # Furnish image
-                frame = furnish_image(frame, face, confidence)
-                encs = face_encodings(frame,face) # List of arrays
+                frame = furnish_image(frame, faces, confidences)
+                encs = face_encodings(frame,faces) # List of arrays
                 if len(test_enc)==0:
                     test_enc = encs[0]
-                print(compare_faces([test_enc],encs[0]),confidence)
+                print(compare_faces([test_enc],encs[0]),confidences)
 
             # Display output
             cv2.imshow(window_title, frame)
