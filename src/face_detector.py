@@ -1,17 +1,19 @@
+import os
 import argparse
+from time import time
 import numpy as np
+import pandas as pd
 import cv2
 import cvlib as cv
-from cvlib.object_detection import draw_bbox
+# from cvlib.object_detection import draw_bbox
 from face_recognition.api import face_encodings, compare_faces
-from time import time
 
 
 def parse_args():
     """
     Input arguments parser.
     """
-    parser = argparse.ArgumentParser(description="Capture and display live camera video on Jetson TX2/TX1")
+    parser = argparse.ArgumentParser(description="Capture and display live camera video on Jetson Nano")
     parser.add_argument("--usb", dest="use_usb",
                         help="use USB webcam",
                         action="store_true")
@@ -21,6 +23,8 @@ def parse_args():
     parser.add_argument("--verbose", dest="verbose",
                         help="print detection outputs",
                         action="store_true")
+    parser.add_argument("--tolerance", dest="tolerance", default=0.6, type=float,
+                        help="How much distance between faces to consider it a match. Lower is more strict. 0.6 is typical best performance.")
     args = parser.parse_args()
     return args
 
@@ -50,7 +54,7 @@ def gstreamer_pipeline(
         )
     )
 
-def furnish_image(frame, faces, confidences):
+def furnish_image_confidence(frame, faces, confidences):
     """Draws bounding boxes & prints detection confidence.
 
     Args:
@@ -106,7 +110,24 @@ def create_face_images(frame, faces, new_size=(120,180)):
         
     return face_imgs
 
-def name_to_faces(faces)
+def init_known_faces(dir="../data/", filename="faces.pkl"):
+    if filename not in os.listdir(dir):
+        df = pd.DataFrame(columns=["ID","name","encoding","confidence"])
+    else:
+        df = pd.read_pickle(os.path.join(dir,filename))
+    return df
+
+def save_known_faces(df, dir="../data/", filename="faces.pkl"):
+    df.to_pickle(os.path.join(dir,filename))
+
+def update_known_faces(df, name, enc, confidence, dir="../data/", filename="faces.pkl"):
+    ID = 0 if len(df)==0 else df["ID"].max()+1
+    new_row = {"ID":ID,"name":name,"encoding":enc,"confidence":confidence}
+    new_df = df.append(new_row, ignore_index=True)
+    return new_df
+
+def name_to_faces(faces):
+    pass
 ###########
 
 def live_inference(args):
@@ -119,33 +140,41 @@ def live_inference(args):
         window_handle = cv2.namedWindow(window_title, cv2.WINDOW_AUTOSIZE)
 
     try:
-        elapsed_time = time()
-
         test_enc = np.array([])
+        # INITIATE KNOWN ENCODINGS
+        known_faces_df = init_known_faces()
 
         while True:
+
+            # Reset elapsed time    
+            frame_start_time = time()
+
             ret, frame = cap.read()
 
             # apply face detection
             faces, confidences = cv.detect_face(frame, threshold=0.5, enable_gpu = not args.cpu_only)
             presence = len(faces)>0
 
-            if args.verbose:
-                print(f"Frame time: {time()-elapsed_time:.3f}s | Face: {faces} | Confidences: {confidences}")
-
-            # Reset elapsed time    
-            elapsed_time = time()
-
             if presence:
-                # Furnish image
-                frame = furnish_image(frame, faces, confidences)
                 encs = face_encodings(frame,faces) # List of arrays
-                if len(test_enc)==0:
-                    test_enc = encs[0]
-                print(compare_faces([test_enc],encs[0]),confidences)
+                # if len(test_enc)==0:
+                #     test_enc = encs[0]
+                # print(compare_faces([test_enc],encs[0]),confidences)
+                names = []
+                for i, enc in enumerate(encs):
+                    comparison = compare_faces(known_faces_df["encoding"].to_list(), enc)
+                    if max(comparison):
+                        names.append(known_faces_df["names"][])
+
+                # Furnish image
+                frame = furnish_image_confidence(frame, faces, confidences)
+
 
             # Display output
             cv2.imshow(window_title, frame)
+
+            if args.verbose:
+                print(f"Frame time: {time()-elapsed_time:.3f}s | Face: {faces} | Confidences: {confidences}")
 
             k = cv2.waitKey(30) & 0xff
             if k == 27: # press 'ESC' to quit
