@@ -202,7 +202,7 @@ def live_inference(args):
                 encs = face_encodings(frame,faces)
                 names = []
                 for i, enc in enumerate(encs):
-                    comparison = compare_faces(known_faces_df["encoding"].to_list(), enc)
+                    comparison = compare_faces(known_faces_df["encoding"].tolist(), enc)
                     if len(comparison)>0 and max(comparison):
                         name, _, _ = get_details(known_faces_df, np.argmax(comparison))
                         names.append(name)
