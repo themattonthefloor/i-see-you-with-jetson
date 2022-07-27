@@ -128,8 +128,7 @@ def init_known_faces(dir="data", pkl_filename="faces.pkl"):
         df = pd.read_pickle(os.path.join(dir,pkl_filename))
         names_dict = [x.replace(".jpg","").split("_") for x in os.listdir(dir) if x.endswith(".jpg")]
         names_dict = {int(x[0]): (x[1] if len(x)>1 else "Unknown") for x in names_dict}
-        print(names_dict)
-        df["name"] = df.index.map(names_dict)
+        df["name"] = df.index.to_series().map(names_dict)
     return df
 
 def save_known_faces(df, dir="data", filename="faces.pkl"):
@@ -182,7 +181,6 @@ def live_inference(args):
         window_handle = cv2.namedWindow(window_title, cv2.WINDOW_AUTOSIZE)
 
     try:
-        test_enc = np.array([])
         # INITIATE KNOWN ENCODINGS
         known_faces_df = init_known_faces()
         print(known_faces_df)
