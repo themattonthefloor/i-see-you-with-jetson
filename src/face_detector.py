@@ -111,6 +111,17 @@ def create_face_images(frame, faces, new_size=(120,180)):
     return face_imgs
 
 def init_known_faces(dir="data", pkl_filename="faces.pkl"):
+    """Initializes known faces from the pickle file,
+    updates the names inferred from image filenames,
+    and returns the DataFrame
+
+    Args:
+        dir (str, optional): Directory of facial images and pickle file. Defaults to "data".
+        pkl_filename (str, optional): Filename of pickle file. Defaults to "faces.pkl".
+
+    Returns:
+        Pandas DataFrame: Dataframe of names, encoding & confidence
+    """
     if pkl_filename not in os.listdir(dir):
         df = pd.DataFrame(columns=["name","encoding","confidence"])
     else:
@@ -122,9 +133,29 @@ def init_known_faces(dir="data", pkl_filename="faces.pkl"):
     return df
 
 def save_known_faces(df, dir="data", filename="faces.pkl"):
+    """Saves the face encodings dataframe to a pickle file.
+
+    Args:
+        df (Pandas DataFrame): Dataframe of names, encoding & confidence
+        dir (str, optional): Directory to save. Defaults to "data".
+        filename (str, optional): Filename to save. Defaults to "faces.pkl".
+    """
     df.to_pickle(os.path.join(dir,filename))
 
 def update_known_faces(df, name, enc, confidence, dir="data", filename="faces.pkl"):
+    """Updates the known face encodings dataframe.
+
+    Args:
+        df (Pandas DataFrame): Dataframe of names, encoding & confidence
+        name (str): Name
+        enc (np.array): Encoding
+        confidence (float): Confidence
+        dir (str, optional): _description_. Defaults to "data".
+        filename (str, optional): _description_. Defaults to "faces.pkl".
+
+    Returns:
+        Pandas DataFrame: Dataframe of names, encoding & confidence
+    """
     new_row = {"name":name,"encoding":enc,"confidence":confidence}
     new_df = df.append(new_row, ignore_index=True)
     return new_df
