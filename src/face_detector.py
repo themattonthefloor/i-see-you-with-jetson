@@ -6,7 +6,7 @@ import pandas as pd
 import cv2
 import cvlib as cv
 # from cvlib.object_detection import draw_bbox
-from face_recognition.api import face_encodings, compare_faces
+from face_recognition.api import face_locations, face_encodings, compare_faces, face_distance
 
 
 def parse_args():
@@ -194,15 +194,18 @@ def live_inference(args):
 
             # apply face detection
             faces, confidences = cv.detect_face(frame, threshold=0.5, enable_gpu = not args.cpu_only)
+            faces_2 = face_locations(frame, model='hog')
+            print(faces, faces_2)
             presence = len(faces)>0
 
             if presence:
                 encs = face_encodings(frame,faces)
                 names = []
                 for i, enc in enumerate(encs):
-                    comparison = compare_faces(known_faces_df["encoding"].tolist(), enc)
-                    if len(comparison)>0 and max(comparison):
-                        name, _, _ = get_details(known_faces_df, np.argmax(comparison))
+                    comparison = face_distance(known_faces_df["encoding"].tolist(), enc)
+                    print(comparison)
+                    if len(comparison)>0 and min(comparison)<args.tolerance:
+                        name, _, _ = get_details(known_faces_df, np.argmin(comparison))
                         names.append(name)
                     else: # Update name, encoding, confidence, facial image file
                         name = "Unknown"
